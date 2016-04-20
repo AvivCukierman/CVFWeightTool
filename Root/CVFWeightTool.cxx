@@ -54,6 +54,7 @@ CVFWeightTool :: CVFWeightTool(const std::string& name) :
   declareProperty("OutputContainer", m_outputContainer);
   declareProperty("doLCWeights", m_doLC);
   declareProperty("PtThreshold", m_ptthreshold);
+  declareProperty("CVFThreshold", m_cvfthreshold);
 }
 
 CVFWeightTool::~CVFWeightTool() {}
@@ -95,12 +96,13 @@ StatusCode CVFWeightTool :: execute ()
   std::pair< xAOD::CaloClusterContainer*, xAOD::ShallowAuxContainer* > clustSC = xAOD::shallowCopyContainer( *in_clusters );
   xAOD::CaloClusterContainer* SC_clusters = clustSC.first;
   int i=0;
+  //std::cout << m_outputContainer << std::endl;
   for(auto clust : HF::sort_container_pt(SC_clusters)){
     if(m_doLC) stateHelperList.add(clust,xAOD::CaloCluster::State(1)); //default is calibrated but we can make it explicit anyway
     else stateHelperList.add(clust,xAOD::CaloCluster::State(0));
-    if(cvfs[i]==0){
+    if(cvfs[i]>-1 && cvfs[i]<=m_cvfthreshold){
       if((m_ptthreshold>=0 && clust->pt() < m_ptthreshold) || (m_ptthreshold<0)){
-        //std::cout << "CVF=0" << std::endl;
+        //std::cout << cvfs[i] << ";" << clust->pt() << std::endl;
         clust->setE(0);
       }
     }
