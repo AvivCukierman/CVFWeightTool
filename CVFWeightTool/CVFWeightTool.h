@@ -48,6 +48,7 @@ public:
   bool m_debug = false;
   bool m_doLC = false;
   float m_ptthreshold = -1;
+  float m_cvfthreshold = 0;
 
   const float pi = 3.14159265;
   const float twopi = pi*2;
