@@ -53,6 +53,8 @@ CVFWeightTool :: CVFWeightTool(const std::string& name) :
   declareProperty("TrackContainer", m_trackContainer);
   declareProperty("OutputContainer", m_outputContainer);
   declareProperty("doLCWeights", m_doLC);
+  declareProperty("doExtrapEst", m_doEst);
+  declareProperty("doExtrap", m_doExtrap);
   declareProperty("PtThreshold", m_ptthreshold);
   declareProperty("CVFThreshold", m_cvfthreshold);
 }
@@ -90,6 +92,8 @@ StatusCode CVFWeightTool :: execute ()
   std::cout << event_number << std::endl;*/
 
   std::vector<float> cvfs;
+  if(m_doExtrap) Error("CVFWeightTool","Full extrapolation not yet implemented in Rootcore. Try doExtrapEst for an estimate of the track extrapolation.");
+  if(m_doEst) setExtrapPhi(tracks);
   setCVF(in_clusters,tracks,cvfs);
 
   CaloClusterChangeSignalStateList stateHelperList;
@@ -119,7 +123,31 @@ StatusCode CVFWeightTool :: finalize ()
   return StatusCode::SUCCESS;
 }
 
+const float params[3] = { -14.6027571, -44.7818374, 540.656643};
+float CVFWeightTool::ExtrapolationEstimate(float pt, float eta, float charge){
+  float eptsindeltaphi = params[0]*pow(eta,4)+params[1]*pow(eta,2)+params[2]*pow(eta,0);
+  float sindeltaphi = eptsindeltaphi/(pt*charge);
+  if (fabs(sindeltaphi)>1.0) return -999.0; //never reaches the detector
+  float deltaphi = asin(sindeltaphi);
+  return deltaphi;
+}
+
+StatusCode CVFWeightTool::setExtrapPhi(const xAOD::TrackParticleContainer* tracks){
+  static SG::AuxElement::Decorator< float > newphi("newphi");
+  for(auto track: HF::sort_container_pt(tracks)){
+    float trketa = track->eta();
+    float trkphi = track->phi();
+    float trkpt = track->pt();
+    float trkcharge = track->charge();
+    float deltaphi = ExtrapolationEstimate(trkpt,trketa,trkcharge);
+    //std::cout << deltaphi << std::endl;
+    if(deltaphi>-998.0) newphi(*track) = trkphi-deltaphi;
+    else newphi(*track) = -999.0;
+  }
+}
+
 StatusCode CVFWeightTool::setCVF(const xAOD::CaloClusterContainer* clusters, const xAOD::TrackParticleContainer* tracks, std::vector<float>& cvfs){
+  static SG::AuxElement::Decorator< float > newphi("newphi");
   for(auto clust: HF::sort_container_pt(clusters)){
     //std::cout << "c: " << clust->pt() << ";" << clust->eta() << ";" << clust->phi() << std::endl;
     float cleta = clust->eta();
@@ -129,8 +157,17 @@ StatusCode CVFWeightTool::setCVF(const xAOD::CaloClusterContainer* clusters, con
     for(auto track: HF::sort_container_pt(tracks)){
       float trketa = track->eta();
       float trkphi = track->phi();
+      /*float trkpt = track->pt();
+      float trkcharge = track->charge();*/
       float deta = trketa-cleta;
       if (fabs(deta)>0.1) continue;
+      if(m_doEst){
+        //float deltaphi = ExtrapolationEstimate(trkpt,trketa,trkcharge);
+        //std::cout << trkpt << ";" << trketa << ";" << trkcharge << ";" << deltaphi << std::endl;
+        //std::cout << newphi(*track) << std::endl;
+        trkphi = newphi(*track);
+        if(trkphi<-998) continue; //track never made it to the calorimeter
+      }
       float dphi = delta_phi(trkphi,clphi);
       if(fabs(dphi)>0.1) continue;
       if(pow(deta,2)+pow(dphi,2) < 0.1*0.1){
