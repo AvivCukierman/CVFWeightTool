@@ -47,6 +47,8 @@ public:
 
   bool m_debug = false;
   bool m_doLC = false;
+  bool m_doEst = false;
+  bool m_doExtrap = false;
   float m_ptthreshold = -1;
   float m_cvfthreshold = 0;
 
@@ -62,7 +64,9 @@ public:
 
   // methods used in the analysis
   virtual StatusCode setCVF(const xAOD::CaloClusterContainer*, const xAOD::TrackParticleContainer*, std::vector<float>&);
+  virtual StatusCode setExtrapPhi(const xAOD::TrackParticleContainer*);
   float delta_phi(float, float );
+  float ExtrapolationEstimate(float,float,float);
 
 private:
   //xAOD::TEvent *m_event; //!
