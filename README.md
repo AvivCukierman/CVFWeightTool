@@ -29,6 +29,7 @@ TrackContainer  | string                    |    "InDetTrackParticles"          
 doLCWeights       | bool                     | false                      | Apply LC weights to clusters before CVF algorithms.
 PtThreshold       | float                     | -1                      | Remove clusters with pT<=PtThreshold and CVF<=CVFThreshold. If -1, then PtTreshold -> infinity.
 CVFThreshold       | float                     | 0                      | Remove clusters with pT<=PtThreshold and CVF<=CVFThreshold.
+doExtrapEst        | bool                     | true                      | Track extrapolation is not available in Rootcore, only in Athena. So an estimate for track extrapolation is provided, that should be accurate for |eta|<1.6.
 
 ## Using
 Add this package as a dependency in `cmt/Makefile.RootCore`.
