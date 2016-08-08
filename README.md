@@ -79,7 +79,7 @@ N.B. The `doLCWeights` option indicates whether to apply LC weights (if true) or
 Note that as it behaves like an `AsgTool`, the functions `setProperty()` and `initialize()` have a return type `StatusCode`.
 
 ## Track Extrapolation
-Track extrapolation is currently only available in Athena. However, the performance of CVF is much better when using extrapolated tracks than when not. Because of this, in the Rootcore version, an estimate for the extrapolated track coordinates at the calorimeter entrance is given, and can be activated with the `doExtrapEst` option. Validation of the accuracy of this estimate can be found [here](https://github.com/AvivCukierman/CVFWeightTool/files/407013/estDeltaPhi.png) and [here](https://github.com/AvivCukierman/CVFWeightTool/files/407013/EtaDeltaPhi.png).
+Track extrapolation is currently only available in Athena. However, the performance of CVF is much better when using extrapolated tracks than when not. Because of this, in the Rootcore version, an estimate for the extrapolated track coordinates at the calorimeter entrance is given, and can be activated with the `doExtrapEst` option. Validation of the accuracy of this estimate can be found [here](https://cloud.githubusercontent.com/assets/11202460/17484749/b3fecd7c-5d8b-11e6-99b7-2453aecef903.png) and [here](https://cloud.githubusercontent.com/assets/11202460/17484748/b3f4d0ec-5d8b-11e6-9c4a-07fbe9722b85.png).
 
 ## Authors
 - [Aviv Cukierman](https://github.com/AvivCukierman)
